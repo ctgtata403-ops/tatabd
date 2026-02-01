@@ -1,0 +1,257 @@
+
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ট্রাভেল এন্ড ট্যুরস এরেনা</title>
+    <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Anek Bangla', sans-serif; scroll-behavior: smooth; }
+        body { background-color: #f4f7f9; overflow-x: hidden; padding-bottom: 50px; }
+
+        /* পপ-আপ ডিজাইন */
+        #discount-popup {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 10001;
+            display: none; justify-content: center; align-items: center;
+        }
+        .popup-content {
+            background: white; padding: 30px; border-radius: 20px; text-align: center;
+            max-width: 320px; position: relative; border: 3px solid #0056b3;
+        }
+        .popup-content h2 { color: #d32f2f; font-size: 1.5rem; margin-bottom: 10px; }
+        .popup-content p { font-size: 1rem; color: #333; margin-bottom: 15px; }
+        .promo-code { background: #eee; padding: 10px; border: 2px dashed #0056b3; font-weight: bold; font-size: 1.2rem; }
+        .close-popup { position: absolute; top: 10px; right: 15px; font-size: 1.8rem; cursor: pointer; color: #999; }
+
+        /* লোডার */
+        #loader {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #0056b3; z-index: 10000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            color: white; padding: 20px; text-align: center;
+        }
+        .loader-plane { width: 50px; fill: white; animation: zigzagFly 3s infinite ease-in-out; margin-bottom: 20px; }
+        #loader-msg { font-size: 1rem; font-weight: 500; max-width: 300px; line-height: 1.6; }
+        @keyframes zigzagFly {
+            0% { transform: translate(-15px, 0) rotate(5deg); }
+            50% { transform: translate(20px, -15px) rotate(15deg); }
+            100% { transform: translate(-15px, 0) rotate(5deg); }
+        }
+
+        header { 
+            background: #111; color: white; padding: 12px 20px; 
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 1000;
+        }
+        .header-logo { font-size: 1.1rem; font-weight: 700; }
+        .typing-sub { font-size: 0.75rem; color: #bbb; min-height: 15px; }
+        #typing-text::after { content: "|"; animation: blink 0.7s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .container { padding: 15px; max-width: 450px; margin: 0 auto; }
+        .service-title { text-align: center; color: #0056b3; margin: 20px 0; font-size: 1.4rem; font-weight: 700; }
+
+        /* সার্ভিস কার্ড */
+        .services-grid { display: flex; flex-direction: column; gap: 10px; }
+        .service-card {
+            background: white; border-radius: 10px; height: 55px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            overflow: hidden; cursor: pointer; position: relative;
+            opacity: 0; transform: translateY(20px); transition: 0.5s;
+        }
+        .service-card.active { opacity: 1; transform: translateY(0); }
+        .card-inner { display: flex; width: 200%; height: 100%; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .service-card.clicked .card-inner { transform: translateX(-50%); }
+        .front-side, .back-side { width: 50%; height: 100%; display: flex; align-items: center; padding: 0 20px; font-size: 1rem; font-weight: 500; }
+        .front-side { justify-content: space-between; border-left: 5px solid #0056b3; }
+        .back-side { background: #eef6ff; color: #d32f2f; font-weight: 700; justify-content: center; }
+
+        /* টুল বক্স */
+        .tool-box { background: white; padding: 18px; border-radius: 15px; margin: 25px 0; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
+        .tool-box h3 { font-size: 1rem; margin-bottom: 12px; color: #333; text-align: center; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+        .tool-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+        label { font-size: 0.85rem; color: #666; font-weight: 600; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.9rem; outline: none; }
+        #calc-result { background: #0056b3; color: white; padding: 12px; border-radius: 8px; text-align: center; font-weight: 700; margin-top: 10px; }
+
+        /* গ্যালারি */
+        .gallery-title { text-align: center; color: #333; margin: 30px 0 15px; font-size: 1.2rem; }
+        .polaroid-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+        .polaroid { background: white; padding: 8px 8px 15px 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); width: 120px; }
+        .polaroid img { width: 100%; height: 85px; object-fit: cover; }
+        .polaroid p { text-align: center; font-size: 0.75rem; margin-top: 6px; font-weight: 600; }
+        .polaroid:nth-child(even) { transform: rotate(3deg); }
+        .polaroid:nth-child(odd) { transform: rotate(-3deg); }
+
+        /* মার্কিউ */
+        .place-section { background: #fff; padding: 15px 0; margin: 25px 0; overflow: hidden; border-top: 1px solid #eee; border-bottom: 1px solid #eee; }
+        .place-track { display: flex; width: calc(180px * 10); animation: scrollPlaces 25s linear infinite; }
+        .place-item { width: 150px; margin: 0 15px; text-align: center; flex-shrink: 0; }
+        .place-item img { width: 100%; height: 80px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .place-item span { font-size: 0.8rem; font-weight: 700; color: #555; display: block; margin-top: 5px; }
+        @keyframes scrollPlaces { 0% { transform: translateX(0); } 100% { transform: translateX(calc(-180px * 5)); } }
+
+        /* ইমার্জেন্সি */
+        .emergency-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .emergency-item { background: #fff5f5; border: 1px solid #feb2b2; padding: 10px; border-radius: 8px; text-align: center; text-decoration: none; color: #c53030; }
+        .emergency-item span { display: block; font-size: 0.75rem; color: #777; }
+
+        /* স্লাইডার */
+        .slider-track { position: relative; width: 100%; height: 50px; background: #fff; border-radius: 25px; overflow: hidden; border: 2px solid #111; margin-top: 25px; }
+        .instruction-text { position: absolute; width: 100%; text-align: center; font-size: 0.8rem; top: 13px; color: #888; z-index: 2; pointer-events: none; }
+        .reveal-text { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; clip-path: inset(0 100% 0 0); z-index: 3; background: white; color: #0056b3; padding: 0 45px; }
+        .plane-handle { position: absolute; left: 5px; width: 40px; height: 40px; background: #111; border-radius: 50%; display: flex; justify-content: center; align-items: center; z-index: 10; top: 3px; }
+
+        #backToTop { position: fixed; bottom: 10px; right: 10px; width: 10px; height: 10px; background: #0056b3; border-radius: 50%; display: none; justify-content: center; align-items: center; z-index: 2000; }
+        #backToTop.flying { animation: flyUp 0.8s forwards; }
+        @keyframes flyUp { 100% { transform: translateY(-100vh); } }
+    </style>
+</head>
+<body>
+
+    <div id="loader">
+        <svg class="loader-plane" viewBox="0 0 24 24"><path d="M21,16L21,14L13,9L13,3.5A1.5,1.5 0 0,0 11.5,2A1.5,1.5 0 0,0 10,3.5L10,9L2,14L2,16L10,13.5L10,18L8,19.5L8,21L11.5,20L15,21L15,19.5L13,18L13,13.5L21,16Z" /></svg>
+        <div id="loader-msg">লোডিং হচ্ছে...</div>
+    </div>
+
+    <div id="discount-popup">
+        <div class="popup-content">
+            <span class="close-popup" onclick="closePopup()">×</span>
+            <h2>ধামাকা অফার!</h2>
+            <p>আজকের বুকিং-এ পাচ্ছেন সরাসরি ৫০০ টাকা ফ্ল্যাট ছাড়!</p>
+            <div class="promo-code">FLY2026</div>
+        </div>
+    </div>
+
+    <header>
+        <div class="header-left">
+            <div class="header-logo">ট্রাভেল এন্ড ট্যুরস এরেনা</div>
+            <div class="typing-sub"><span id="typing-text"></span></div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2 class="service-title">আমাদের বিশেষ সেবা</h2>
+        <div class="services-grid">
+            <div class="service-card" onclick="this.classList.toggle('clicked')"><div class="card-inner"><div class="front-side">ই-পাসপোর্ট আবেদন <span>➔</span></div><div class="back-side">৬০০০/-</div></div></div>
+            <div class="service-card" onclick="this.classList.toggle('clicked')"><div class="card-inner"><div class="front-side">ভিসা প্রসেসিং <span>➔</span></div><div class="back-side">৫০০০/-</div></div></div>
+            <div class="service-card" onclick="this.classList.toggle('clicked')"><div class="card-inner"><div class="front-side">এয়ার টিকেট বুকিং <span>➔</span></div><div class="back-side">৮০০০/-</div></div></div>
+            <div class="service-card" onclick="this.classList.toggle('clicked')"><div class="card-inner"><div class="front-side">হজ্ব ও ওমরাহ <span>➔</span></div><div class="back-side">প্যাকেজ দেখুন</div></div></div>
+            <div class="service-card" onclick="this.classList.toggle('clicked')"><div class="card-inner"><div class="front-side">ট্যুরিস্ট গাইড <span>➔</span></div><div class="back-side">২০০০/-</div></div></div>
+            <div class="service-card" onclick="this.classList.toggle('clicked')"><div class="card-inner"><div class="front-side">হোটেল বুকিং <span>➔</span></div><div class="back-side">৩০০০/-</div></div></div>
+            <div class="service-card" onclick="this.classList.toggle('clicked')"><div class="card-inner"><div class="front-side">ট্রাভেল ইন্স্যুরেন্স <span>➔</span></div><div class="back-side">১৫০০/-</div></div></div>
+            <div class="service-card" onclick="this.classList.toggle('clicked')"><div class="card-inner"><div class="front-side">কার রেন্টাল <span>➔</span></div><div class="back-side">৪০০০/-</div></div></div>
+            <div class="service-card" onclick="this.classList.toggle('clicked')"><div class="card-inner"><div class="front-side">ডকুমেন্ট নোটারি <span>➔</span></div><div class="back-side">৫০০/-</div></div></div>
+            <div class="service-card" onclick="this.classList.toggle('clicked')"><div class="card-inner"><div class="front-side">মেডিকেল ট্যুরিজম <span>➔</span></div><div class="back-side">যোগাযোগ</div></div></div>
+        </div>
+
+        <div class="tool-box">
+            <h3>স্মার্ট বাজেট ক্যালকুলেটর</h3>
+            <div class="tool-row"><label>যাত্রা শুরুর স্থান:</label><select id="start" onchange="smartCalc()"><option value="0">বাছাই করুন</option><option value="500">ঢাকা</option><option value="800">চট্টগ্রাম</option><option value="1200">সিলেট</option></select></div>
+            <div class="tool-row"><label>গন্তব্য:</label><select id="end" onchange="smartCalc()"><option value="0">বাছাই করুন</option><option value="4500">সাজেক ভ্যালি</option><option value="4000">কক্সবাজার</option><option value="3000">সিলেট</option></select></div>
+            <div class="tool-row"><label>যাত্রী সংখ্যা:</label><input type="number" id="pax" value="1" min="1" oninput="smartCalc()"></div>
+            <div id="calc-result">তথ্য প্রদান করুন</div>
+        </div>
+
+        <div class="place-section">
+            <div class="place-track">
+                <div class="place-item"><img src="https://images.unsplash.com/photo-1607412683160-873b1189daec?q=80&w=200"><span>সিলেট</span></div>
+                <div class="place-item"><img src="https://images.unsplash.com/photo-1602528495711-f52bf3988a00?q=80&w=200"><span>সাজেক</span></div>
+                <div class="place-item"><img src="https://images.unsplash.com/photo-1587222318667-31212ce2828d?q=80&w=200"><span>কক্সবাজার</span></div>
+                <div class="place-item"><img src="https://images.unsplash.com/photo-1706459671568-9809c9d13430?q=80&w=200"><span>সুন্দরবন</span></div>
+                <div class="place-item"><img src="https://images.unsplash.com/photo-1642179335770-82d5ffc4b439?q=80&w=200"><span>রাঙ্গামাটি</span></div>
+                <div class="place-item"><img src="https://images.unsplash.com/photo-1607412683160-873b1189daec?q=80&w=200"><span>সিলেট</span></div>
+            </div>
+        </div>
+
+        <h3 class="gallery-title">গ্যালারি</h3>
+        <div class="polaroid-container">
+            <div class="polaroid"><img src="https://images.unsplash.com/photo-1602528495711-f52bf3988a00?q=80&w=200"><p>সাজেক ভ্যালি</p></div>
+            <div class="polaroid"><img src="https://images.unsplash.com/photo-1706459671568-9809c9d13430?q=80&w=200"><p>সুন্দরবন</p></div>
+            <div class="polaroid"><img src="https://images.unsplash.com/photo-1607412683160-873b1189daec?q=80&w=200"><p>সিলেট</p></div>
+        </div>
+
+        <div class="tool-box">
+            <h3 style="border-bottom:1px solid #ffccd5">ইমার্জেন্সি ডিরেক্টরি</h3>
+            <div class="emergency-grid">
+                <a href="tel:999" class="emergency-item"><span>জাতীয় সেবা</span><b>৯৯৯</b></a>
+                <a href="tel:01713398486" class="emergency-item"><span>ট্যুরিস্ট পুলিশ</span><b>যোগাযোগ</b></a>
+                <a href="tel:028901100" class="emergency-item"><span>এয়ারপোর্ট</span><b>হেল্প</b></a>
+                <a href="tel:16163" class="emergency-item"><span>ফায়ার সার্ভিস</span><b>১৬১৬৩</b></a>
+            </div>
+        </div>
+
+        <div class="slider-track" id="track">
+            <div class="instruction-text" id="instr">ডানে টেনে নিন ✈</div>
+            <div class="reveal-text" id="reveal-text"></div>
+            <div id="plane" class="plane-handle"><svg style="width:18px; fill:white; transform:rotate(90deg);" viewBox="0 0 24 24"><path d="M21,16L21,14L13,9L13,3.5A1.5,1.5 0 0,0 11.5,2A1.5,1.5 0 0,0 10,3.5L10,9L2,14L2,16L10,13.5L10,18L8,19.5L8,21L11.5,20L15,21L15,19.5L13,18L13,13.5L21,16Z" /></svg></div>
+        </div>
+    </div>
+
+    <div id="backToTop" onclick="scrollToTop()"><svg style="width:20px; fill:white; transform:rotate(-45deg);" viewBox="0 0 24 24"><path d="M21,16L21,14L13,9L13,3.5A1.5,1.5 0 0,0 11.5,2A1.5,1.5 0 0,0 10,3.5L10,9L2,14L2,16L10,13.5L10,18L8,19.5L8,21L11.5,20L15,21L15,19.5L13,18L13,13.5L21,16Z" /></svg></div>
+
+    <script>
+        // র্যান্ডম আয়াত/হাদীস লিস্ট
+        const islamicQuotes = [
+            "“জমিনে পরিভ্রমণ করো এবং দেখো আল্লাহ কীভাবে সৃষ্টি শুরু করেছেন।” <br>— আল কুরআন (২৯:২০)",
+            "“তিন ব্যক্তির দোয়া নিশ্চিতভাবে কবুল হয়, তার মধ্যে একজন হলো মুসাফির।” <br>— হাদীস (তিরমিযী)",
+            "“তোমরা জমিনে ভ্রমণ করো, ফলে তা তোমাদের অন্তরকে চিন্তাশীল এবং কানকে শ্রবণক্ষম করবে।” <br>— আল কুরআন (২২:৪৬)",
+            "“ভ্রমণ করো, সুস্থ থাকবে।” <br>— হাদীস (মুসনাদে আহমাদ)",
+            "“আল্লাহর সন্তুষ্টির জন্য যে ব্যক্তি সফরে বের হয়, সে ফিরে না আসা পর্যন্ত আল্লাহর রাস্তায় থাকে।” <br>— হাদীস"
+        ];
+
+        function smartCalc() {
+            const s = parseInt(document.getElementById('start').value), e = parseInt(document.getElementById('end').value), p = parseInt(document.getElementById('pax').value), res = document.getElementById('calc-result');
+            if(s>0 && e>0 && p>0) res.innerText = "আনুমানিক বাজেট: " + (s+e)*p + " ৳";
+            else res.innerText = "সঠিক তথ্য দিন";
+        }
+
+        const typingTexts = ["সাশ্রয়ী টিকেট", "দ্রুত ভিসা সার্ভিস", "নিরাপদ হজ্ব ও ওমরাহ"];
+        let tCount = 0, tIndex = 0;
+        (function type() {
+            if (tCount === typingTexts.length) tCount = 0;
+            let letter = typingTexts[tCount].slice(0, ++tIndex);
+            document.getElementById('typing-text').textContent = letter;
+            if (letter.length === typingTexts[tCount].length) { tCount++; tIndex = 0; setTimeout(type, 1500); }
+            else setTimeout(type, 80);
+        }());
+
+        const travelQuotes = ["ভ্রমণ মানুষকে উদার করে।", "নতুন স্মৃতি জমা করুন।", "ভ্রমণ ক্লান্তি মেটায়।"];
+        function setQuote() { document.getElementById('reveal-text').innerText = travelQuotes[Math.floor(Math.random()*travelQuotes.length)]; }
+
+        function showPopup() { document.getElementById('discount-popup').style.display = 'flex'; }
+        function closePopup() { document.getElementById('discount-popup').style.display = 'none'; }
+
+        window.onscroll = () => { document.getElementById('backToTop').style.display = window.scrollY > 100 ? "flex" : "none"; };
+        function scrollToTop() { const btn = document.getElementById('backToTop'); btn.classList.add('flying'); window.scrollTo({top:0, behavior:'smooth'}); setTimeout(()=>btn.classList.remove('flying'), 800); }
+
+        window.onload = () => {
+            // লোডারে র্যান্ডম আয়াত সেট করা
+            document.getElementById('loader-msg').innerHTML = islamicQuotes[Math.floor(Math.random()*islamicQuotes.length)];
+            setQuote();
+            setTimeout(() => {
+                document.getElementById('loader').style.display = 'none';
+                document.querySelectorAll('.service-card').forEach((c, i) => { setTimeout(() => c.classList.add('active'), i * 80); });
+                setTimeout(showPopup, 5000);
+            }, 2500); // আয়াত পড়ার জন্য সময় বাড়ানো হয়েছে
+        };
+
+        const plane = document.getElementById('plane'), track = document.getElementById('track'), rev = document.getElementById('reveal-text'), inst = document.getElementById('instr');
+        let drag = false;
+        const move = (e) => {
+            if (!drag) return;
+            let cx = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            let r = track.getBoundingClientRect();
+            let x = Math.max(5, Math.min(cx - r.left - 20, r.width - 45));
+            plane.style.left = x + 'px';
+            inst.style.opacity = 1 - (x/(r.width-45)*3);
+            rev.style.clipPath = `inset(0 ${100 - ((x+20)/r.width*100)}% 0 0)`;
+        };
+        plane.onmousedown = plane.ontouchstart = () => drag = true;
+        window.onmouseup = window.ontouchend = () => { drag = false; if(parseInt(plane.style.left) < 10) setQuote(); };
+        window.onmousemove = window.ontouchmove = move;
+    </script>
+</body>
+                                                                                                                                                                                                </html>
